@@ -5,6 +5,7 @@ import '../../common/components/custom_scaffold.dart';
 import '../../common/components/row_text.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/icons.dart';
+import '../auth/auth_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String role;
@@ -242,6 +243,26 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ),
+          const SizedBox(
+            height: 15,
+          ),
+          MaterialButton(
+            color: ColorName.primary,
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const AuthPage();
+                  },
+                ),
+              );
+            },
+            child: const Text(
+              'Log out',
+              style: TextStyle(color: ColorName.light),
+            ),
+          )
         ],
       ),
     );

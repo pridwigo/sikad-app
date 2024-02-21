@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sikad_app/src/bloc/login/login_bloc.dart';
+import 'package:sikad_app/src/data/datasources/auth_local_datasource.dart';
+import 'package:sikad_app/src/data/models/request/auth_request_model.dart';
+import 'package:sikad_app/src/pages/dosen/dosen_page.dart';
+import 'package:sikad_app/src/pages/mahasiswa/mahasiswa_page.dart';
 
 import '../../../common/components/buttons.dart';
 import '../../../common/components/custom_text_field.dart';
 import '../../../common/constants/colors.dart';
 
 class LoginBottomSheet extends StatefulWidget {
-  final VoidCallback onPressed;
   const LoginBottomSheet({
     super.key,
-    required this.onPressed,
   });
 
   @override
@@ -16,12 +20,12 @@ class LoginBottomSheet extends StatefulWidget {
 }
 
 class _LoginBottomSheetState extends State<LoginBottomSheet> {
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    usernameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -29,7 +33,12 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(
+        top: 20,
+        right: 20,
+        left: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -43,9 +52,9 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 },
               ),
               const Text(
-                "Masuk",
+                "Sign In",
                 style: TextStyle(
-                  fontSize: 18.0,
+                  fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -66,26 +75,94 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
               const SizedBox(height: 8.0),
               const Text(
-                "Masukkan username dan password agar bisa mengakses informasi administrasi.",
+                "Masukkan Email dan Password agar bisa mengakses informasi administrasi.",
                 style: TextStyle(
                   color: ColorName.grey,
                 ),
               ),
               const SizedBox(height: 50.0),
               CustomTextField(
-                controller: usernameController,
-                label: 'Username',
+                textInputType: TextInputType.emailAddress,
+                controller: emailController,
+                label: 'Email',
               ),
               const SizedBox(height: 12.0),
               CustomTextField(
+                textInputType: TextInputType.visiblePassword,
                 controller: passwordController,
                 label: 'Password',
                 obscureText: true,
               ),
               const SizedBox(height: 24.0),
-              Button.filled(
-                onPressed: widget.onPressed,
-                label: 'Masuk',
+              BlocListener<LoginBloc, LoginState>(
+                listener: (context, state) {
+                  state.maybeWhen(
+                    orElse: () {},
+                    loaded: (data) {
+                      AuthLocalDatasource().saveAuthData(data);
+                      if (data.user.roles == 'mahasiswa') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const MahasiswaPage();
+                            },
+                          ),
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const DosenPage();
+                            },
+                          ),
+                        );
+                      }
+                    },
+                    error: (message) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Error!'),
+                            content: Text(message),
+                          );
+                        },
+                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text('Error - $message'),
+                      //   ),
+                      // );
+                    },
+                  );
+                },
+                child: BlocBuilder<LoginBloc, LoginState>(
+                  builder: (context, state) {
+                    return state.maybeWhen(
+                      orElse: () {
+                        return Button.filled(
+                          onPressed: () {
+                            final requestModel = AuthRequestModel(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                            context.read<LoginBloc>().add(
+                                  LoginEvent.login(requestModel),
+                                );
+                          },
+                          label: 'Sign In',
+                        );
+                      },
+                      loading: () {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 12.0),
             ],

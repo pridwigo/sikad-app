@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/login/login_bloc.dart';
 import '../../common/components/buttons.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/images.dart';
@@ -28,7 +30,7 @@ class _AuthPageState extends State<AuthPage> {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              "SIAKAD CWB",
+              "SIKAD",
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.w800,
@@ -37,9 +39,19 @@ class _AuthPageState extends State<AuthPage> {
             ),
             const SizedBox(height: 8.0),
             const Text(
-              "Melayani Edukasi, Memudahkan Administrasi!",
+              "Sistem Akademik Universitas PRDG",
               style: TextStyle(
                 fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: ColorName.grey,
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            const Text(
+              textAlign: TextAlign.center,
+              "Melayani Edukasi, Memudahkan Administrasi!",
+              style: TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: ColorName.grey,
               ),
@@ -59,17 +71,7 @@ class _AuthPageState extends State<AuthPage> {
                   useSafeArea: true,
                   isScrollControlled: true,
                   builder: (BuildContext context) {
-                    return LoginBottomSheet(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DosenPage(),
-                          ),
-                        );
-                      },
-                    );
+                    return const LoginBottomSheet();
                   },
                 );
               },
@@ -83,16 +85,9 @@ class _AuthPageState extends State<AuthPage> {
                   useSafeArea: true,
                   isScrollControlled: true,
                   builder: (BuildContext context) {
-                    return LoginBottomSheet(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MahasiswaPage(),
-                          ),
-                        );
-                      },
+                    return BlocProvider(
+                      create: (context) => LoginBloc(),
+                      child: const LoginBottomSheet(),
                     );
                   },
                 );

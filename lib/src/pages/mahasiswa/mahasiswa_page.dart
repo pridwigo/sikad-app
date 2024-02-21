@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../common/constants/colors.dart';
 import '../../common/constants/icons.dart';
 import '../profile/profile_page.dart';
+import '../profile/profile_test.dart';
 import 'dashboard_page.dart';
 import 'schedules_page.dart';
 
@@ -18,7 +19,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   final List<Widget> _pages = [
     const DashboardPage(),
     const SchedulesPage(),
-    const ProfilePage(role: 'Mahasiswa')
+    const ProfileTest(roles: '')
   ];
 
   void _onItemTapped(int index) {
